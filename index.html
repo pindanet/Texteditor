@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl" dir="ltr">
+
+<head>
+	<meta charset="utf-8">
+	<title>Text Editor</title>
+	<link rel="stylesheet" href="texteditor.css">
+</head>
+<!--Body start-->
+<body>
+	<div class="contentEditableToolbar">
+		<!-- Adding different buttons for
+			different functionality-->
+		<!--onclick attribute is added to give
+			button a work to do when it is clicked-->
+<!-- Button Icons from https://github.com/ckeditor/ckeditor5 -->
+    <img src="buttons/bold.svg" width="20" height="20" title="Bold" onclick='edit(this, "bold");'>
+    <img src="buttons/italic.svg" width="20" height="20" title="Italic" onclick='edit(this, "italic");'>
+    <img src="buttons/underline.svg" width="20" height="20" title="Underline" onclick='edit(this, "underline");'>
+    <img src="buttons/code.svg" width="20" height="20" title="Code" onclick='edit(this, "code");'>
+    <span class="separator"></span>
+
+        <img src="buttons/paragraph.svg" width="20" height="20" title="Paragraph" onclick='edit(this, "p");'>
+        <img src="buttons/heading1.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h1");'>
+        <img src="buttons/heading2.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h2");'>
+        <img src="buttons/heading3.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h3");'>
+        <img src="buttons/heading4.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h4");'>
+        <img src="buttons/heading5.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h5");'>
+        <img src="buttons/heading6.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h6");'>
+        <img src="buttons/preformatted.svg" width="20" height="20" title="Preformated" onclick="edit(this, 'pre');">
+
+        <img src="buttons/align-left.svg" width="20" height="20" title="Align left" onclick="edit(this, 'left');">
+        <img src="buttons/align-center.svg" width="20" height="20" title="Center" onclick='edit(this, "center");'>
+        <img src="buttons/align-right.svg" width="20" height="20" title="Align right" onclick='edit(this, "right");'>
+        <img src="buttons/align-justify.svg" width="20" height="20" title="Justify" onclick='edit(this, "justify");'>
+
+<!-- https://www.tutorialspoint.com/how-to-add-images-in-select-list-in-html -->
+<!--
+    <div class="dropdown">
+      <img class="dropbtn" src="buttons/heading.svg" width="20" height="20" title="Headings">
+      <div class="dropText">
+        <img src="buttons/paragraph.svg" width="20" height="20" title="Paragraph" onclick='edit(this, "p");'>
+        <img src="buttons/heading1.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h1");'>
+        <img src="buttons/heading2.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h2");'>
+        <img src="buttons/heading3.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h3");'>
+        <img src="buttons/heading4.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h4");'>
+        <img src="buttons/heading5.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h5");'>
+        <img src="buttons/heading6.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h6");'>
+        <img src="buttons/preformatted.svg" width="20" height="20" title="Preformated" onclick="edit(this, 'pre');">
+      </div>
+    </div>
+    <div class="dropdown">
+      <img src="buttons/align-left.svg" width="20" height="20" class="dropbtn" title="Text align">
+      <div class="dropText">
+        <img src="buttons/align-left.svg" width="20" height="20" title="Align left" onclick="edit(this, 'left');">
+        <img src="buttons/align-center.svg" width="20" height="20" title="Center" onclick='edit(this, "center");'>
+        <img src="buttons/align-right.svg" width="20" height="20" title="Align right" onclick='edit(this, "right");'>
+        <img src="buttons/align-justify.svg" width="20" height="20" title="Justify" onclick='edit(this, "justify");'>
+      </div>
+    </div>
+-->
+    <span class="separator"></span>
+    <img src="buttons/undo.svg" width="20" height="20" title="Undo" onclick='undo(this);'>
+    <img src="buttons/source-editing.svg" width="20" height="20" alt="" title="HTML editor" onclick="editHTML(this);">
+    <img src="buttons/link.svg" width="20" height="20" title="Link" onclick='edit(this, "link");'>
+    <span class="separator"></span>
+    <img src="buttons/bulletedlist.svg" width="20" height="20" title="Bulleted list" onclick='edit(this, "bulletedlist");'>
+    <img src="buttons/numberedlist.svg" width="20" height="20" title="Numbered list" onclick='edit(this, "numberedlist");'>
+    <img src="buttons/indent.svg" width="20" height="20" title="Increase indent" onclick="edit(this, 'indent');">
+    <img src="buttons/outdent.svg" width="20" height="20" title="Decrease indent" onclick="edit(this, 'outdent');">
+    <span class="imgToolbar" style="display: none;">
+      <span class="separator"></span>
+      <img src="buttons/object-left.svg" width="20" height="20" title="Align left" onclick="edit(this, 'imgleft');">
+      <img src="buttons/object-center.svg" width="20" height="20" title="Center" onclick="edit(this, 'imgcenter');">
+      <img src="buttons/object-inline-right.svg" width="20" height="20" title="Align inline right" onclick="edit(this, 'imginlineright');">
+      <img src="buttons/object-inline-left.svg" width="20" height="20" title="Align inline left" onclick="edit(this, 'imginlineleft');">
+      <img src="buttons/object-size-small.svg" width="20" height="20" title="Reduce" onclick="edit(this, 'imgsmaller');">
+      <img src="buttons/object-size-full.svg" width="20" height="20" title="Enlarge" onclick="edit(this, 'imgbigger');">
+    </span>
+	</div>
+	<div contentEditable id="texteditor">
+    <h1>Text editor</h1>
+  	<p>If desired, you can paste an image.</p>
+  	<p>Undo text with Ctrl+z.</p>
+  	<p>A text editor is a type of computer program that edits plain text.
+  	Text editors are provided with operating systems and software development packages, and can be used to change files such as configuration files, documentation files and programming language source code.</p>
+  	<p>There are important differences between plain text (created and edited by text editors) and rich text (such as that created by word processors or desktop publishing software).</p>
+  	<p>Source code: https://github.com/pindanet/Texteditor.</p>
+	</div>
+	<!--External JavaScript file-->
+	<script type="text/javascript">
+  	setTimeout(function() {
+  	   document.getElementById("texteditor").focus();
+    }, 0);
+	</script>
+	<script src="texteditor.js"></script>
+</body>
+
+</html>
