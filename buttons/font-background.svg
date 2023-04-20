@@ -1,0 +1,3 @@
+<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" onclick="top.edit(window.frameElement, 'fontbackgroundcolor');"><rect x="0" y="0" width="20" height="20" fill="#ffffff">
+    <title>Font Background Color</title>
+    </rect><path stroke="#000000" d="M4 2 m8.38 9.262H7.62L10 5.506l2.38 5.756zm.532 1.285L14.34 16h1.426L10.804 4H9.196L4.234 16H5.66l1.428-3.453h5.824z"><title>Font Background Color</title></path></svg>
