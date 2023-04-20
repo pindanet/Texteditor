@@ -190,6 +190,19 @@ function setParagraph(styleParagraph) {
   } while (true);
   editHistory.push(["Until"]);
 }
+function watchColorPicker(event) {
+  if (colorElement.data.search("font-color.svg") !== -1) {
+    colorElement.contentDocument.firstElementChild.lastElementChild.attributes['stroke'].nodeValue = event.target.value;
+    edit(colorElement, "fontcolor");
+    return;
+  }
+  if (colorElement.data.search("font-background.svg") !== -1) {
+    colorElement.contentDocument.firstElementChild.firstElementChild.attributes['fill'].nodeValue = event.target.value;
+    edit(colorElement, "fontbackgroundcolor");
+    return;
+  }
+}
+let colorElement;
 function edit(el, format) {
   let styleElement = "";
   let selectedParent = "";
@@ -224,7 +237,32 @@ function edit(el, format) {
           styleElement.style.textDecoration = "";
         }
       }
-      break;     
+      break;
+    case 'color':
+      colorElement = el.previousElementSibling;
+      colorinput = document.getElementById('colorPicker');
+      if (colorElement.data.search("font-color.svg") !== -1) {
+        colorinput.value = colorElement.contentDocument.firstElementChild.lastElementChild.attributes['stroke'].nodeValue;
+      }
+      if (colorElement.data.search("font-background.svg") !== -1) {
+        colorinput.value = colorElement.contentDocument.firstElementChild.firstElementChild.attributes['fill'].nodeValue;
+      }
+      colorinput.focus();
+      colorinput.click();
+      break;
+    case 'fontcolor':
+      if (styleElement = getElement(el)) {
+        addToHistory(styleElement);
+        styleElement.style.color = el.contentDocument.firstElementChild.lastElementChild.attributes['stroke'].nodeValue;
+      }
+      break;
+    case 'fontbackgroundcolor':
+      if (styleElement = getElement(el)) {
+        addToHistory(styleElement);
+        styleElement.style.backgroundColor = el.contentDocument.firstElementChild.firstElementChild.attributes['fill'].nodeValue;
+      }
+      break;
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/color     
     case 'code':
       if (styleElement = getElement(el)) {
         addToHistory(styleElement);
@@ -496,4 +534,11 @@ function imgButtonsOn(el) {
       imgToolbars[i].style.display = "none";
     }
   }
+}
+function getOffset(el) {
+  const rect = el.getBoundingClientRect();
+  return {
+    left: rect.left + window.scrollX,
+    top: rect.top + window.scrollY
+  };
 }
