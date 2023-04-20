@@ -11,28 +11,36 @@
 	<div class="contentEditableToolbar">
 		<!-- Adding different buttons for
 			different functionality-->
+		<input type="color" id="colorPicker" onchange="watchColorPicker(event);">
 		<!--onclick attribute is added to give
 			button a work to do when it is clicked-->
 <!-- Button Icons from https://github.com/ckeditor/ckeditor5 -->
     <img src="buttons/bold.svg" width="20" height="20" title="Bold" onclick='edit(this, "bold");'>
     <img src="buttons/italic.svg" width="20" height="20" title="Italic" onclick='edit(this, "italic");'>
     <img src="buttons/underline.svg" width="20" height="20" title="Underline" onclick='edit(this, "underline");'>
+<!-- The onclick attributes and titles in object's are embedded in the SVG code -->
+    <object width="20" height="20" type="image/svg+xml" data="buttons/font-color.svg"></object>
+    <img class="dropdownArrow" src="buttons/dropdown-arrow.svg" width="10" height="10" title="Select Font Color" onclick="edit(this, 'color');">
+    
+    <object width="20" height="20" type="image/svg+xml" data="buttons/font-background.svg"></object>
+    <img class="dropdownArrow" src="buttons/dropdown-arrow.svg" width="10" height="10" title="Select Font Background Color" onclick="edit(this, 'color');">
+    
     <img src="buttons/code.svg" width="20" height="20" title="Code" onclick='edit(this, "code");'>
     <span class="separator"></span>
 
-        <img src="buttons/paragraph.svg" width="20" height="20" title="Paragraph" onclick='edit(this, "p");'>
-        <img src="buttons/heading1.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h1");'>
-        <img src="buttons/heading2.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h2");'>
-        <img src="buttons/heading3.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h3");'>
-        <img src="buttons/heading4.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h4");'>
-        <img src="buttons/heading5.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h5");'>
-        <img src="buttons/heading6.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h6");'>
-        <img src="buttons/preformatted.svg" width="20" height="20" title="Preformated" onclick="edit(this, 'pre');">
+    <img src="buttons/paragraph.svg" width="20" height="20" title="Paragraph" onclick='edit(this, "p");'>
+    <img src="buttons/heading1.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h1");'>
+    <img src="buttons/heading2.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h2");'>
+    <img src="buttons/heading3.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h3");'>
+    <img src="buttons/heading4.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h4");'>
+    <img src="buttons/heading5.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h5");'>
+    <img src="buttons/heading6.svg" width="20" height="20" title="Heading1" onclick='edit(this, "h6");'>
+    <img src="buttons/preformatted.svg" width="20" height="20" title="Preformated" onclick="edit(this, 'pre');">
 
-        <img src="buttons/align-left.svg" width="20" height="20" title="Align left" onclick="edit(this, 'left');">
-        <img src="buttons/align-center.svg" width="20" height="20" title="Center" onclick='edit(this, "center");'>
-        <img src="buttons/align-right.svg" width="20" height="20" title="Align right" onclick='edit(this, "right");'>
-        <img src="buttons/align-justify.svg" width="20" height="20" title="Justify" onclick='edit(this, "justify");'>
+    <img src="buttons/align-left.svg" width="20" height="20" title="Align left" onclick="edit(this, 'left');">
+    <img src="buttons/align-center.svg" width="20" height="20" title="Center" onclick='edit(this, "center");'>
+    <img src="buttons/align-right.svg" width="20" height="20" title="Align right" onclick='edit(this, "right");'>
+    <img src="buttons/align-justify.svg" width="20" height="20" title="Justify" onclick='edit(this, "justify");'>
 
 <!-- https://www.tutorialspoint.com/how-to-add-images-in-select-list-in-html -->
 <!--
@@ -87,12 +95,12 @@
   	<p>There are important differences between plain text (created and edited by text editors) and rich text (such as that created by word processors or desktop publishing software).</p>
   	<p>Source code: https://github.com/pindanet/Texteditor.</p>
 	</div>
-	<!--External JavaScript file-->
 	<script type="text/javascript">
   	setTimeout(function() {
   	   document.getElementById("texteditor").focus();
-    }, 0);
+    }, 1);
 	</script>
+	<!--External JavaScript file-->
 	<script src="texteditor.js"></script>
 </body>
 
