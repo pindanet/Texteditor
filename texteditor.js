@@ -1,5 +1,5 @@
 // ToDo
-// select range after undo
+// undo drag & drop
 // loop contentEditable and create toolbar
 // https://github.com/eligrey/l10n.js
 
@@ -54,25 +54,33 @@ const editHistory = [];
 function undo(buttonEl) {
   let el;
   if (editHistory.length > 0) {
+    let newRange = new Range();
+    let selection = window.getSelection();
     let lastAction = editHistory.pop();
+    selection.removeAllRanges();
     switch(lastAction[0]) {
       case 'editHTML':
         let contentEditableEl = nextContentEditable(buttonEl);
         contentEditableEl.innerHTML = lastAction[1];
+        newRange.selectNodeContents(contentEditableEl);
         break;
       case 'link':
         el = document.getElementById(lastAction[1]);
         el.innerHTML = lastAction[2];
+        newRange.selectNodeContents(el);
         break;
       case 'removeimg':
+        newRange.setStart(lastAction[1], 0);
+        newRange.setEnd(lastAction[1], 0);
         lastAction[1].remove();
-        return;
         break;
       case 'Until':
         lastAction = editHistory.pop();
+        newRange.setEnd(document.getElementById(lastAction[0]).firstChild, document.getElementById(lastAction[0]).firstChild.textContent.length);
         do {
           el = document.getElementById(lastAction[0]);
           el.style.cssText = lastAction[1];
+          newRange.setStart(el, 0);
           lastAction = editHistory.pop();
         } while (lastAction[0] !== 'Repeat');
         break;
@@ -80,12 +88,8 @@ function undo(buttonEl) {
         el = document.getElementById(lastAction[0]);
         el.style.cssText = lastAction[1];
     }
-    // Select undone element
-    let selection = window.getSelection();
-    selection.removeAllRanges();
-    let range = document.createRange();
-    range.selectNodeContents(el);
-    selection.addRange(range);
+    // Select undo range
+    selection.addRange(newRange);
   }
 }
 
