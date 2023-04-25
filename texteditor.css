@@ -56,12 +56,6 @@
 .contentEditableToolbar .dropdown:hover .dropbtn {
   background-color: lightgray;
 }
-/*
-.contentEditableToolbar .colorcontainer {
-  position: relative;
-  display: inline-block;
-}
-*/
 .contentEditableToolbar input[type=color] {
   display: none;
 }
