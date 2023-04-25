@@ -1,4 +1,5 @@
 // ToDo
+// select range after undo
 // loop contentEditable and create toolbar
 // https://github.com/eligrey/l10n.js
 
@@ -111,44 +112,87 @@ function getCaretIndex(element) {
   }
   return position;
 }
-function getElement(el) {
-  let styleElement = "";
-  let contentEditableEl = nextContentEditable(el);
+
+function styleNodes(el, styleName, setStyle, delStyle) {
   var range = window.getSelection().getRangeAt(0);
   if (range.toString().length === 0) {
     alert("Nothing selected!");
-    return styleElement;
-  }
-  // check for previous editing
-  let editorHTML = contentEditableEl.innerHTML;
-  let editorText = contentEditableEl.textContent;
-  let caretPosition = getCaretIndex(contentEditableEl);
-  let startPinDaEdited = editorHTML.indexOf('<span id="PinDaEdited');
-  while (startPinDaEdited !== -1) {
-    let prePindaEdited = editorHTML.substring(0, startPinDaEdited);
-    let strippedLength = prePindaEdited.replace( /(<([^>]+)>)/ig, '').length;
-    if (caretPosition === strippedLength + range.toString().length) {
-      let startIdPinDaEdited = editorHTML.indexOf('id="', startPinDaEdited) + 4;
-      let endIdPinDaEdited = editorHTML.indexOf('"', startIdPinDaEdited);
-      let idPinDaEdited = editorHTML.substring(startIdPinDaEdited, endIdPinDaEdited);
-      styleElement = document.getElementById(idPinDaEdited);
-      break;
-    }
-    startPinDaEdited = editorHTML.indexOf('<span id="PinDaEdited', startPinDaEdited + 1);
+    return;
   }
 
-  if (styleElement === "") { // First editing of selection
-    const newParent = document.createElement("span");
-    try {
-      range.surroundContents(newParent);
+  editHistory.push(["Repeat"]);
+
+  var _iterator = document.createNodeIterator(
+    range.commonAncestorContainer,
+    NodeFilter.SHOW_ALL, // pre-filter
+    {
+      // custom filter
+      acceptNode: function (node) {
+        return NodeFilter.FILTER_ACCEPT;
+      }
     }
-    catch(err) {
-      alert("Deze bewerking kan niet op uw selectie worden uitgevoerd!");
-      return styleElement;
+  );
+  var _nodes = [];
+  var styleElements = [];
+  // selected text within one element
+  if (range.startContainer == range.endContainer) {
+    _iterator.nextNode();
+    newNode = _iterator.referenceNode;
+    if (_iterator.referenceNode.nodeType === 3) {
+      newNode = _iterator.referenceNode.splitText(range.startOffset);
+      selectedNode = newNode.splitText(range.endOffset);
     }
-    styleElement = newParent;
+    styleElements.push(newNode);
+  } else { // selected text over multiple elements
+    while (_iterator.nextNode()) {
+      if (_nodes.length === 0 && _iterator.referenceNode !== range.startContainer) continue;
+      _nodes.push(_iterator.referenceNode);
+      if (_iterator.referenceNode.nodeType == 3) {
+        if (_iterator.referenceNode == range.startContainer) {
+          newNode = _iterator.referenceNode.splitText(range.startOffset);
+          continue;
+        }
+        if (_iterator.referenceNode == range.endContainer) {
+          newNode = _iterator.referenceNode.splitText(range.endOffset);
+        }
+        styleElements.push(_iterator.referenceNode);
+      }
+      if (_iterator.referenceNode === range.endContainer) break;
+    }
   }
-  return styleElement;
+
+  rangeStartNode =  styleElements[0];
+  for (var i = 0; i < styleElements.length; i++) {
+    // Selection already formatted
+    if (styleElements[i].parentElement.id.substr(0, 11) == "PinDaEdited"  && styleElements[i].parentElement.textContent == styleElements[i].textContent) {
+      addToHistory(styleElements[i].parentElement);
+      if (styleElements[i].parentElement.style[styleName] !== setStyle) {
+        styleElements[i].parentElement.style[styleName] = setStyle;
+      } else {
+        styleElements[i].parentElement.style[styleName] = delStyle;
+      }
+      rangeEndNode = styleElements[i];
+    } else { // fist time formatting
+      if (styleElements[i].nodeType === 3) { // Textnode
+        if (styleElements[i].textContent.length !== 0) {  // not empty
+          var span = document.createElement('span');
+          styleElements[i].after(span);
+          span.appendChild(styleElements[i]);
+          addToHistory(span);
+          span.style[styleName] = setStyle;
+          rangeEndNode = styleElements[i];
+        }
+      }
+    }
+  }
+  // Select old range
+  let newRange = new Range();
+  let selection = window.getSelection();
+  selection.removeAllRanges();
+  newRange.setStart(rangeStartNode, 0);
+  newRange.setEnd(rangeEndNode,rangeEndNode.textContent.length);
+  selection.addRange(newRange);
+  editHistory.push(["Until"]);
 }
 function getParagraph(selectedParent) {
 // get block element for paragraph style
@@ -209,34 +253,13 @@ function edit(el, format) {
   let selectedParagraph = "";
   switch(format) {
     case 'bold':
-      if (styleElement = getElement(el)) {
-        addToHistory(styleElement);
-        if (styleElement.style.fontWeight !== "bold") {
-          styleElement.style.fontWeight = "bold";
-        } else {
-          styleElement.style.fontWeight = "";
-        }
-      }
+      styleNodes(el, "fontWeight", "bold", "");
       break;
     case 'italic':
-      if (styleElement = getElement(el)) {
-        addToHistory(styleElement);
-        if (styleElement.style.fontStyle !== "italic") {
-          styleElement.style.fontStyle = "italic";
-        } else {
-          styleElement.style.fontStyle = "";
-        }
-      }
+      styleNodes(el, "fontStyle", "italic", "");
       break;     
     case 'underline':
-      if (styleElement = getElement(el)) {
-        addToHistory(styleElement);
-        if (styleElement.style.textDecoration !== "underline") {
-          styleElement.style.textDecoration = "underline";
-        } else {
-          styleElement.style.textDecoration = "";
-        }
-      }
+      styleNodes(el, "textDecoration", "underline", "");
       break;
     case 'color':
       colorElement = el.previousElementSibling;
@@ -251,27 +274,14 @@ function edit(el, format) {
       colorinput.click();
       break;
     case 'fontcolor':
-      if (styleElement = getElement(el)) {
-        addToHistory(styleElement);
-        styleElement.style.color = el.contentDocument.firstElementChild.lastElementChild.attributes['stroke'].nodeValue;
-      }
+      styleNodes(el, "color", el.contentDocument.firstElementChild.lastElementChild.attributes['stroke'].nodeValue, el.contentDocument.firstElementChild.lastElementChild.attributes['stroke'].nodeValue);
       break;
     case 'fontbackgroundcolor':
-      if (styleElement = getElement(el)) {
-        addToHistory(styleElement);
-        styleElement.style.backgroundColor = el.contentDocument.firstElementChild.firstElementChild.attributes['fill'].nodeValue;
-      }
+      styleNodes(el, "backgroundColor", el.contentDocument.firstElementChild.firstElementChild.attributes['fill'].nodeValue, el.contentDocument.firstElementChild.firstElementChild.attributes['fill'].nodeValue);
       break;
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/color     
     case 'code':
-      if (styleElement = getElement(el)) {
-        addToHistory(styleElement);
-        if (styleElement.style.fontFamily !== "monospace") {
-          styleElement.style.fontFamily = "monospace";
-        } else {
-          styleElement.style.fontFamily = "";
-        }
-      }
+      styleNodes(el, "fontFamily", "monospace", "");
       break;
 // https://www.w3schools.com/cssref/css_default_values.php
     case 'pre':
@@ -388,14 +398,14 @@ function edit(el, format) {
       break;
     case 'imgbigger':
       addToHistory(imgElement);
-            let contentEditableEl = imgElement.parentElement;
-            while (! contentEditableEl.hasAttribute("contentEditable")) {
-              contentEditableEl = contentEditableEl.parentElement;
-            }
-            let maxImgSize = imgElement.naturalWidth;
-            if (imgElement.naturalWidth > contentEditableEl.clientWidth) {
-              maxImgSize = contentEditableEl.clientWidth;
-            }
+      let contentEditableEl = imgElement.parentElement;
+      while (! contentEditableEl.hasAttribute("contentEditable")) {
+        contentEditableEl = contentEditableEl.parentElement;
+      }
+      let maxImgSize = imgElement.naturalWidth;
+      if (imgElement.naturalWidth > contentEditableEl.clientWidth) {
+        maxImgSize = contentEditableEl.clientWidth;
+      }
       if (imgElement.style.width) {
         setStyle(imgElement, {'width': Math.min(maxImgSize, parseInt(parseInt(imgElement.style.width) + imgElement.naturalWidth * .1)) + 'px'});
       } else {
