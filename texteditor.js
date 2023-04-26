@@ -29,14 +29,15 @@ function nextContentEditable(el) {
   }
   return nextSibling;
 }
+var editHTMLCaretPos;
 function editHTML(el) {
   let contentEditableEl = nextContentEditable(el);
   if (el.className !== "buttonActive") {
     el.className = "buttonActive";
     let textarea = document.createElement('textarea');
   	let text = document.createTextNode(contentEditableEl.innerHTML);
-
- 	  editHistory.push(['editHTML', contentEditableEl.innerHTML]);
+    editHTMLCaretPos = getCaretIndex(contentEditableEl);
+ 	  editHistory.push(['editHTML', contentEditableEl.innerHTML, editHTMLCaretPos]);
   	textarea.appendChild(text);
     textarea.setAttribute("style", "height:" + contentEditableEl.offsetHeight + "px; width:" + contentEditableEl.clientWidth + "px; border-width: 0px; padding: 0px;");
     textarea.setAttribute("id","PindaHTMLarea");
@@ -47,6 +48,7 @@ function editHTML(el) {
     contentEditableEl.style.display = "";
     contentEditableEl.innerHTML = document.getElementById("PindaHTMLarea").value;
     document.getElementById("PindaHTMLarea").remove();
+    setCaretPosition(contentEditableEl, editHTMLCaretPos);
   }
 }
 
@@ -62,17 +64,14 @@ function undo(buttonEl) {
       case 'editHTML':
         let contentEditableEl = nextContentEditable(buttonEl);
         contentEditableEl.innerHTML = lastAction[1];
-        newRange.selectNodeContents(contentEditableEl);
+        setCaretPosition(contentEditableEl, lastAction[2]);
+        return;
+//        newRange.selectNodeContents(contentEditableEl);
         break;
       case 'link':
         el = document.getElementById(lastAction[1]);
         el.innerHTML = lastAction[2];
         newRange.selectNodeContents(el);
-        break;
-      case 'removeimg':
-        newRange.setStart(lastAction[1], 0);
-        newRange.setEnd(lastAction[1], 0);
-        lastAction[1].remove();
         break;
       case 'Until':
         lastAction = editHistory.pop();
@@ -116,7 +115,31 @@ function getCaretIndex(element) {
   }
   return position;
 }
-
+function setCaretPosition(el, pos){
+    // Loop through all child nodes
+    for(var node of el.childNodes){
+        if(node.nodeType == 3){ // we have a text node
+            if(node.length >= pos){
+                // finally add our range
+                var range = document.createRange(),
+                    sel = window.getSelection();
+                range.setStart(node,pos);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return -1; // we are done
+            }else{
+                pos -= node.length;
+            }
+        }else{
+            pos = setCaretPosition(node,pos);
+            if(pos == -1){
+                return -1; // no need to finish the for loop
+            }
+        }
+    }
+    return pos; // needed because of recursion stuff
+}
 function styleNodes(el, styleName, setStyle, delStyle) {
   var range = window.getSelection().getRangeAt(0);
   if (range.toString().length === 0) {
@@ -497,7 +520,6 @@ const callback = (mutationList, observer) => {
     if (mutation.type === "childList") {
       if (mutation.addedNodes.length > 0) {
         if (mutation.addedNodes[0].tagName === "IMG") {
-          editHistory.push(['removeimg', mutation.addedNodes[0]]);
           mutation.addedNodes[0].onclick = function() {imgButtonsOn(this)};
           mutation.addedNodes[0].title = "Click to (de)select";
           mutation.addedNodes[0].style.outlineStyle = "";
@@ -527,12 +549,33 @@ const observer = new MutationObserver(callback);
 
 // Later, you can stop observing
 //observer.disconnect();
-
+const undoTextCounter = [];
+function contentEditableOnkeydown(event) {
+  for (var i = 0; i < undoTextCounter.length; i++) {
+    if (event.key == " " || event.key == ".") { // break at end of word or sentence
+      if (event.target.textContent.length > undoTextCounter[i][1] + 9) { //at least 10 characters has been typed
+        undoTextCounter[i][1] = event.target.textContent.length;
+     	  editHistory.push(['editHTML', event.target.innerHTML, getCaretIndex(event.target)]);
+      }
+    }
+  }
+}
+function contentEditableOndrop(event) {
+  let contentEditableEl = event.target;
+  while (! contentEditableEl.hasAttribute("contentEditable")) {
+    contentEditableEl = contentEditableEl.parentElement;
+  }
+  editHistory.push(['editHTML', contentEditableEl.innerHTML, getCaretIndex(contentEditableEl)]);
+}
 let contentEditableEls = document.querySelectorAll('div[contentEditable]');
 for (var i = 0; i < contentEditableEls.length; i++) {
   observer.observe(contentEditableEls[i], config);
+  contentEditableEls[i].addEventListener("keydown", contentEditableOnkeydown);
+  contentEditableEls[i].addEventListener("drop", contentEditableOndrop);
+  undoTextCounter[i] = [contentEditableEls[i], contentEditableEls[i].textContent.length];
+// initialize undo buffer.
+  editHistory.push(['editHTML', contentEditableEls[i].innerHTML, 0]);
 }
-
 let imgElement;
 function imgButtonsOn(el) {
   imgElement = el;
@@ -548,11 +591,4 @@ function imgButtonsOn(el) {
       imgToolbars[i].style.display = "none";
     }
   }
-}
-function getOffset(el) {
-  const rect = el.getBoundingClientRect();
-  return {
-    left: rect.left + window.scrollX,
-    top: rect.top + window.scrollY
-  };
 }
