@@ -1,5 +1,4 @@
 // ToDo
-// undo drag & drop
 // loop contentEditable and create toolbar
 // https://github.com/eligrey/l10n.js
 
