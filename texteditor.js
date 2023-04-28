@@ -2,6 +2,81 @@
 // loop contentEditable and create toolbar
 // https://github.com/eligrey/l10n.js
 
+var translations = ({
+	"en": {
+		"%Bold": "Bold",
+		"%Italic": "Italic",
+		"%Underline": "Underline",
+		"Font Color": "Font Color",
+		"%Select Font Color": "Select Font Color",
+		"Font Background Color": "Font Background Color",
+		"%Select Font Background Color": "Select Font Background Color",
+		"%Code": "Code",
+		"%Paragraph": "Paragraph",
+		"%Heading 1": "Heading 1",
+		"%Heading 2": "Heading 2",
+		"%Heading 3": "Heading 3",
+		"%Heading 4": "Heading 4",
+		"%Heading 5": "Heading 5",
+		"%Heading 6": "Heading 6",
+		"%Preformated": "Preformated",
+		"%Align left": "Align left",
+		"%Enlarge": "Enlarge"
+	},
+	"nl": {
+		"%Bold": "Vet",
+		"%Italic": "Cursief",
+		"%Underline": "Onderstrepen",
+		"Font Color": "Tekstkleur",
+		"%Select Font Color": "Selecteer Tekstkleur",
+		"Font Background Color": "Tekenachtergrondkleur",
+		"%Select Font Background Color": "Selecteer Tekenachtergrondkleur",
+		"%Code": "Broncode",
+		"%Paragraph": "Alinea",
+		"%Heading 1": "Kop 1",
+		"%Heading 2": "Kop 2",
+		"%Heading 3": "Kop 3",
+		"%Heading 4": "Kop 4",
+		"%Heading 5": "Kop 5",
+		"%Heading 6": "Kop 6",
+		"%Preformated": "Voorgevormd",
+		"%Align left": "Links uitlijnen",
+		"%Enlarge": "Vergroten"
+	}
+});
+var l10n;
+if (navigator.languages != undefined) { 
+  l10n = navigator.languages[0];
+} else { 
+  l10n = navigator.language;
+}
+l10n = l10n.substr(0,2);
+if (! translations.hasOwnProperty(l10n)) {
+  l10n = "en";
+}
+
+function translateSVG(child) {
+  child.contentDocument.firstElementChild.querySelectorAll('*').forEach(function(node) {
+    if (node.nodeName == "title") {
+      node.innerHTML = translations[l10n][node.textContent];
+    }
+  });
+}
+
+let contentEditableToolbars = document.getElementsByClassName('contentEditableToolbar');
+for (var contentEditableToolbar = 0; contentEditableToolbar < contentEditableToolbars.length; contentEditableToolbar++) {
+  contentEditableToolbars[contentEditableToolbar].querySelectorAll('*').forEach(function(child) {
+    if (child.nodeName == "OBJECT") {
+      setTimeout(translateSVG, 1000, child);
+    } else {
+      if (child.title.charAt(0) == "%") {
+        child.title = translations[l10n][child.title];
+      }
+    }
+    child = child.nextElementSibling;
+  });
+}
+
 const isValidUrl = urlString=> {
   try { 
   	return Boolean(new URL(urlString)); 
