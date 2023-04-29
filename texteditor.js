@@ -1,8 +1,6 @@
 // ToDo
 // loop contentEditable and create toolbar
-// https://github.com/eligrey/l10n.js
-
-var translations = ({
+var translate = ({
 	"en": {
 		"%Bold": "Bold",
 		"%Italic": "Italic",
@@ -21,7 +19,25 @@ var translations = ({
 		"%Heading 6": "Heading 6",
 		"%Preformated": "Preformated",
 		"%Align left": "Align left",
-		"%Enlarge": "Enlarge"
+		"%Center": "Center",
+		"%Align right": "Align right",
+		"%Justify": "Justify",
+		"%Undo": "Undo",
+		"%HTML editor": "HTML editor",
+		"%Link": "Link",
+		"%Bulleted list": "Bulleted list",
+		"%Numbered list": "Numbered list",
+		"%Increase indent": "Increase indent",
+		"%Decrease indent": "Decrease indent",
+		"%Align inline right": "Align inline right",
+		"%Align inline left": "Align inline left",
+		"%Reduce": "Reduce",
+		"%Enlarge": "Enlarge",
+		"Nothing selected!": "Nothing selected!",
+		"Link removed": "Link removed",
+		"Please enter the link for \"": "Please enter the link for \"",
+		"Invalid URL entered!": "Invalid URL entered!",
+		"Ctrl Click to test": "Ctrl Click to test"
 	},
 	"nl": {
 		"%Bold": "Vet",
@@ -41,7 +57,25 @@ var translations = ({
 		"%Heading 6": "Kop 6",
 		"%Preformated": "Voorgevormd",
 		"%Align left": "Links uitlijnen",
-		"%Enlarge": "Vergroten"
+		"%Center": "Centreren",
+		"%Align right": "Rechts uitlijnen",
+		"%Justify": "Uitvullen",
+		"%Undo": "Ongedaan maken",
+		"%HTML editor": "HTML editor",
+		"%Link": "Hyperlink",
+		"%Bulleted list": "Ongeordende lijst",
+		"%Numbered list": "Geordende lijst",
+		"%Increase indent": "Inspringing vergroten",
+		"%Decrease indent": "Inspringing verkleinen",
+		"%Align inline right": "Rechts van tekst uitlijnen",
+		"%Align inline left": "Links van tekst uitlijnen",
+		"%Reduce": "Verkleinen",
+		"%Enlarge": "Vergroten",
+		"Nothing selected!": "Niets geselecteerd!",
+		"Link removed": "Hyperlink verwijderd",
+		"Please enter the link for \"": "Geef de hyperlink voor \"",
+		"Invalid URL entered!": "Ongeldige URL!",
+		"Ctrl Click to test": "Test met Ctrl Klik"
 	}
 });
 var l10n;
@@ -51,14 +85,14 @@ if (navigator.languages != undefined) {
   l10n = navigator.language;
 }
 l10n = l10n.substr(0,2);
-if (! translations.hasOwnProperty(l10n)) {
+if (! translate.hasOwnProperty(l10n)) {
   l10n = "en";
 }
 
 function translateSVG(child) {
   child.contentDocument.firstElementChild.querySelectorAll('*').forEach(function(node) {
     if (node.nodeName == "title") {
-      node.innerHTML = translations[l10n][node.textContent];
+      node.innerHTML = translate[l10n][node.textContent];
     }
   });
 }
@@ -70,7 +104,7 @@ for (var contentEditableToolbar = 0; contentEditableToolbar < contentEditableToo
       setTimeout(translateSVG, 1000, child);
     } else {
       if (child.title.charAt(0) == "%") {
-        child.title = translations[l10n][child.title];
+        child.title = translate[l10n][child.title];
       }
     }
     child = child.nextElementSibling;
@@ -217,7 +251,7 @@ function setCaretPosition(el, pos){
 function styleNodes(el, styleName, setStyle, delStyle) {
   var range = window.getSelection().getRangeAt(0);
   if (range.toString().length === 0) {
-    alert("Nothing selected!");
+    alert(translate[l10n]["Nothing selected!"]);
     return;
   }
 
@@ -518,7 +552,7 @@ function edit(el, format) {
       let selectedClone = range.cloneContents();
       let linkText = range.toString();
       if (linkText.length === 0) {
-        alert("Nothing selected!");
+        alert(translate[l10n]["Nothing selected!"]);
       } else {
         // check for link tag
         selectedParent = getSelectedParent();
@@ -542,23 +576,23 @@ function edit(el, format) {
             let pa = linkEl.parentNode;
             while(linkEl.firstChild) pa.insertBefore(linkEl.firstChild, linkEl);
             pa.removeChild(linkEl);
-            alert("Link removed");
+            alert(translate[l10n]["Link removed"]);
             return;
           }
           startPinDaEdited = editorHTML.indexOf('<a id="PinDaLink', startPinDaEdited + 1);
         }
-          let link = prompt("Please enter the link for \"" + linkText + "\"", linkText);
+          let link = prompt(translate[l10n]["Please enter the link for \""] + linkText + "\"", linkText);
           if (link == null) {
             break;
           } else {
             if (isValidUrl(link) == false) {
-              alert("Invalid URL entered!");
+              alert(translate[l10n]["Invalid URL entered!"]);
               break;
             } else {
               styleElement = document.createElement('a');
               styleElement.innerHTML = linkText;
               styleElement.setAttribute("id", "PinDaLink" + EditedElementCounter++);
-              styleElement.title = "Ctrl Click to test";
+              styleElement.title = translate[l10n]["Ctrl Click to test"];
               styleElement.href = link;
               styleElement.target = "_blank";
               styleElement.onclick = function(e) {
