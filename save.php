@@ -36,6 +36,12 @@ if ($erasePrevious) { // Test: removes all the previous saved text files
     }
   }
 }
+// Create directory to save the text files
+if (!file_exists($savedir)) {
+	if (!mkdir($savedir, 0777, true)) {
+		die('Directory creation failed...');
+	}
+}
 
 if ($encrypt) {
 // If you want to encrypt the text
@@ -60,11 +66,6 @@ if ($encrypt) {
 }
 
 // Save text
-if (!file_exists($savedir)) {
-	if (!mkdir($savedir, 0777, true)) {
-		die('Directory creation failed...');
-	}
-}
 $bestand = tempnam ($savedir, date("Y-m-d-H-i-s"));
 unlink($bestand);
 $bestand .= ".html";
