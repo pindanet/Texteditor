@@ -643,8 +643,6 @@ const callback = (mutationList, observer) => {
           imgButtonsOn(mutation.addedNodes[0]);
        }
       }
-//    } else if (mutation.type === "attributes") {
-//      console.log(`The ${mutation.attributeName} attribute was modified.`);
     }
   }
 };
