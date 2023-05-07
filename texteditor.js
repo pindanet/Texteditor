@@ -1,6 +1,4 @@
 // ToDo
-// focus after paragraph edit
-// save
 var translate = ({
 	"en": {
 		"%Bold": "Bold",
