@@ -18,6 +18,10 @@
   	<p>Source code: https://github.com/pindanet/Texteditor.</p>
   </div>
 	<script type="text/javascript">loadEditor(document.getElementById("texteditor1"), "texteditor.html");</script>
+	<p>And here is an empty editor:</p>
+	<div id="texteditor2"></div>
+	<script type="text/javascript">loadEditor(document.getElementById("texteditor2"), "texteditor.html");</script>
+  <div id="saveViewer"></div>
 	<script type="text/javascript">
     function save(event) {
       if (window.location.href.indexOf("github.io") != -1) { // Github Pages don't support PHP
@@ -25,13 +29,24 @@
         elemDiv.style.cssText = 'color: red; font-weight: bold;';
         document.body.appendChild(elemDiv);
         elemDiv.innerHTML = 'Github pages do not support PHP, use the demo at <a href="https://texteditor.pindanet.be/" target="_blank">texteditor.pindanet.be</a>.';
-        event.preventDefault();
-      	return false;
       }
+// get content editor
+      let editorToolbar = event.target;
+      while (editorToolbar.className != "contentEditableToolbar") {
+        editorToolbar = editorToolbar.parentElement;
+      }
+      let content = editorToolbar.parentElement.querySelectorAll('div[contentEditable]')[0].innerHTML;
+// get passphrase
+      let passphrase = editorToolbar.querySelectorAll('.passphrase')[0].value;
+// send text to server
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+        document.getElementById("saveViewer").innerHTML = this.responseText;
+      }
+      xhttp.open("POST", "save.php");
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send("content=" + content + "&passphrase=" + passphrase);
     }
 	</script>
-	<p>And here is an empty editor:</p>
-	<div id="texteditor2"></div>
-	<script type="text/javascript">loadEditor(document.getElementById("texteditor2"), "texteditor.html");</script>
 </body>
 </html>
