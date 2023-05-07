@@ -1,4 +1,4 @@
-  <form action="save.php" method="post">
+  <div>
   	<div class="contentEditableToolbar">
   		<!-- Adding different buttons for
   			different functionality-->
@@ -77,9 +77,9 @@
         <img src="buttons/object-size-full.svg" width="20" height="20" title="%Enlarge" onclick="edit(this, 'imgbigger');">
       </span>
       <span class="separator"></span>
-  		<input type="password" id="passphrase" name="passphrase" placeholder="Passphrase to encrypt text">
+  		<input type="password" class="passphrase" placeholder="Passphrase to encrypt text">
   		<input value="Save" type="submit" onclick="save(event);">
   	</div>
   	<div contentEditable></div>
-		<textarea id="content" name="content" style="display:none;" ></textarea>
-  </form>
+		<textarea class="content" style="display:none;" ></textarea>
+  </div>
