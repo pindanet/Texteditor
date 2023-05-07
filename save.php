@@ -118,19 +118,11 @@ AKAM;
 
   mail($mailTo, $Subject, $Body, $Headers);
 }
-echo '<!DOCTYPE html>';
-echo '<html lang="nl-BE">';
-echo '<head>';
-echo '<title>Text saved</title>';
-echo '</head>';
-echo '<body>';
-echo "<p>The following text was saved in the file $bestand</p>";
+$sendback = "<p style='color: blue; font-weight: bold; text-decoration: underline;'>The following text was saved in the file $bestand</p>";
 if($encrypt) {
-  echo openssl_decrypt($content, $encrypt_method, $passphrase, $options = 0, $iv);
-  echo "<h2>The encrypted text:</h2>";
+  $sendback .= openssl_decrypt($content, $encrypt_method, $passphrase, $options = 0, $iv);
+  $sendback .= "<h2>The encrypted text:</h2>";
 }
-echo $content;
-echo "<p><a href=\"./index.html\">Back to the Text editor</a></p>";
-echo '</body>';
-echo '</html>';
+$sendback .= $content;
+echo $sendback;
 ?>
