@@ -29,7 +29,7 @@ foreach ( $badWords as $word ) {
 }
 
 if ($erasePrevious) { // Test: removes all the previous saved text files
-  $files = glob($savedir.'*.html');
+  $files = glob($savedir.'*.gz');
   foreach ($files as $file) {
     if (is_file($file)) {
       unlink($file);
@@ -62,15 +62,14 @@ if ($encrypt) {
     exit("Encryption Error!");
   }
   $encrypted_string = openssl_encrypt($content, $encrypt_method, $passphrase, $options = OPENSSL_RAW_DATA, $iv);
-  $content = base64_encode($encrypted_string);
 }
 
 // Save text
 $bestand = tempnam ($savedir, date("Y-m-d-H-i-s"));
 unlink($bestand);
-$bestand .= ".html";
+$bestand .= ".gz";
 $file=fopen($bestand,"a") or exit("Open file to write failed!");
-fputs($file, $content);
+fputs($file, gzcompress($encrypted_string, 9));
 fclose($file);
 
 if(strlen($mailTo) > 0) { // Mail sturen
@@ -121,9 +120,9 @@ AKAM;
 
 $sendback = "<p style='color: blue; font-weight: bold; text-decoration: underline;'>The following text was saved in the file $bestand</p>";
 if($encrypt) {
-  $sendback .= openssl_decrypt(file_get_contents($bestand), $encrypt_method, $passphrase, $options = 0, $iv);
+  $sendback .= openssl_decrypt(gzuncompress(file_get_contents($bestand)), $encrypt_method, $passphrase, $options = OPENSSL_RAW_DATA, $iv);
   $sendback .= "<h2>The encrypted text:</h2>";
 }
-$sendback .= $content;
+$sendback .= $encrypted_string;
 echo $sendback;
 ?>
