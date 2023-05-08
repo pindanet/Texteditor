@@ -121,7 +121,7 @@ AKAM;
 
 $sendback = "<p style='color: blue; font-weight: bold; text-decoration: underline;'>The following text was saved in the file $bestand</p>";
 if($encrypt) {
-  $sendback .= openssl_decrypt($content, $encrypt_method, $passphrase, $options = 0, $iv);
+  $sendback .= openssl_decrypt(file_get_contents($bestand), $encrypt_method, $passphrase, $options = 0, $iv);
   $sendback .= "<h2>The encrypted text:</h2>";
 }
 $sendback .= $content;
