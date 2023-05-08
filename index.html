@@ -36,16 +36,19 @@
         editorToolbar = editorToolbar.parentElement;
       }
       let content = editorToolbar.parentElement.querySelectorAll('div[contentEditable]')[0].innerHTML;
+      let blob = new Blob([content], {type:"text/html"});
+      var formData = new FormData();
+      formData.append('blobHTML', blob);
 // get passphrase
       let passphrase = editorToolbar.querySelectorAll('.passphrase')[0].value;
+      formData.append('passphrase', passphrase);
 // send text to server
       const xhttp = new XMLHttpRequest();
       xhttp.onload = function() {
         document.getElementById("saveViewer").innerHTML = this.responseText;
       }
       xhttp.open("POST", "save.php");
-      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhttp.send("content=" + content + "&passphrase=" + passphrase);
+      xhttp.send(formData);
     }
 	</script>
 </body>
