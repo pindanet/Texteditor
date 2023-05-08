@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $passphrase = trim($passphrase);
   $passphrase = stripslashes($passphrase);
   $passphrase = htmlspecialchars($passphrase);
-  $content = $_POST["content"];
+  $content = file_get_contents($_FILES["blobHTML"]["tmp_name"]);
 } else {
   exit("Aborted: accept POST only!");
 }
@@ -118,6 +118,7 @@ AKAM;
 
   mail($mailTo, $Subject, $Body, $Headers);
 }
+
 $sendback = "<p style='color: blue; font-weight: bold; text-decoration: underline;'>The following text was saved in the file $bestand</p>";
 if($encrypt) {
   $sendback .= openssl_decrypt($content, $encrypt_method, $passphrase, $options = 0, $iv);
