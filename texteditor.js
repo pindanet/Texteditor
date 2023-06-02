@@ -748,7 +748,13 @@ function loadEditor(elem, HTMLFile) {
   const xhttp = new XMLHttpRequest();
   xhttp.onload = function() {
     preloaded = elem.innerHTML;
-    elem.innerHTML = this.responseText;
+    // adjust folder
+    let HTMLCode = this.responseText;
+    let slashPos = HTMLFile.lastIndexOf("/");
+    if (slashPos > -1) {
+      HTMLCode = HTMLCode.replaceAll('buttons/', HTMLFile.substring(0, slashPos + 1) + 'buttons/');
+    }
+    elem.innerHTML = HTMLCode;
     initEditor(elem, preloaded);
   }
   xhttp.open("GET", HTMLFile);
