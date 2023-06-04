@@ -17,10 +17,17 @@
   	<p>There are important differences between plain text (created and edited by text editors) and rich text (such as that created by word processors or desktop publishing software).</p>
   	<p>Source code: https://github.com/pindanet/Texteditor.</p>
   </div>
-	<script type="text/javascript">loadEditor(document.getElementById("texteditor1"), "texteditor.html");</script>
+	<script type="text/javascript">
+	  loadEditor(document.getElementById("texteditor1"), "texteditor.html");
+	</script>
 	<p>And here is an empty editor:</p>
 	<div id="texteditor2"></div>
-	<script type="text/javascript">loadEditor(document.getElementById("texteditor2"), "texteditor.html");</script>
+	<script type="text/javascript">
+	  loadEditor(document.getElementById("texteditor2"), "texteditor.html");
+	  setTimeout(() => {
+      document.getElementById("texteditor2").querySelectorAll('div[contentEditable]')[0].focus();
+    }, "100");
+	</script>
   <div id="saveViewer"></div>
 	<script type="text/javascript">
     function save(event) {
