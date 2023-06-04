@@ -720,7 +720,7 @@ function initEditor(elem, preloaded) {
       }
     }
     
-    contentEditableEls[i].focus();
+//    contentEditableEls[i].focus();
     // Translate
     let contentEditableToolbars = elem.getElementsByClassName('contentEditableToolbar');
     for (var contentEditableToolbar = 0; contentEditableToolbar < contentEditableToolbars.length; contentEditableToolbar++) {
